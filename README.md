@@ -3,26 +3,27 @@
 ## Sumário
 
 - [🔐 Credenciais de Banco de Dados (Oracle)](#credenciais-de-banco-de-dados-oracle)
-- [📌 Visão Geral](#visão-geral)
+- [📌 Visão Geral](#visao-geral)
 - [🏗️ Arquitetura](#arquitetura)
 - [🗄️ Bases de Dados](#bases-de-dados)
-- [🐳 Containerização](#containerização)
+- [🐳 Containerização](#containerizacao)
 - [📬 Mensageria (Kafka)](#mensageria-kafka)
-- [♻️ Idempotência](#idempotência)
+- [♻️ Idempotência](#idempotencia)
 - [🔄 Saga](#saga)
 - [⚙️ Minimal APIs](#minimal-apis)
-- [⚙️ Configurações](#configurações)
+- [⚙️ Configurações](#configuracoes)
 - [🧪 Testes](#testes)
 - [▶️ Fluxos do Sistema](#fluxos-do-sistema)
-- [🔑 Token e identificação do usuário](#token-e-identificação-do-usuário)
+- [🔑 Token e identificação do usuário](#token-e-identificacao-do-usuario)
 - [📮 Testes via Postman](#testes-via-postman)
-- [▶️ Execução Rápida](#execução-rápida)
+- [▶️ Execução Rápida](#execucao-rapida)
 - [📚 Tecnologias](#tecnologias)
 - [🚀 Deploy em Kubernetes](#deploy-em-kubernetes)
-- [👨‍💻 Observações](#observações)
+- [👨‍💻 Observações](#observacoes)
 
 ---
 
+<a id="credenciais-de-banco-de-dados-oracle"></a>
 ## 🔐 Credenciais de Banco de Dados (Oracle)
 
 Para visualizar dados e tabelas em ferramentas como **DBeaver** ou **SQL Developer**:
@@ -44,6 +45,7 @@ O usuário **bankmore** é o schema de aplicação (criado automaticamente pelo 
 
 ---
 
+<a id="visao-geral"></a>
 # 📌 Visão Geral
 
 O **BankMore** é uma plataforma bancária distribuída baseada em microserviços para gestão de contas correntes, transferências e cobrança de tarifas.
@@ -63,6 +65,7 @@ Toda a aplicação é **containerizada** e pode ser iniciada com um único coman
 
 ---
 
+<a id="arquitetura"></a>
 # 🏗️ Arquitetura
 
 Arquitetura de microserviços orientada a eventos:
@@ -89,6 +92,7 @@ Arquitetura de microserviços orientada a eventos:
 
 ---
 
+<a id="bases-de-dados"></a>
 # 🗄️ Bases de Dados
 
 As tabelas são criadas no schema **bankmore** e organizadas por serviço.
@@ -121,6 +125,7 @@ As tabelas são criadas no schema **bankmore** e organizadas por serviço.
 
 ---
 
+<a id="containerizacao"></a>
 # 🐳 Containerização
 
 Ambiente 100% **Docker** + **Docker Compose**.
@@ -171,6 +176,7 @@ Nenhuma ação manual é necessária para criação de schema ou tópicos.
 
 ---
 
+<a id="mensageria-kafka"></a>
 # 📬 Mensageria (Kafka)
 
 A comunicação entre serviços ocorre via eventos no **Kafka**.
@@ -193,6 +199,7 @@ A comunicação entre serviços ocorre via eventos no **Kafka**.
 
 ---
 
+<a id="idempotencia"></a>
 # ♻️ Idempotência
 
 Operações financeiras usam chave idempotente persistida em banco. Mensagens Kafka são processadas com controle de duplicidade via `idempotencia_kafka`.
@@ -206,6 +213,7 @@ Operações financeiras usam chave idempotente persistida em banco. Mensagens Ka
 
 ---
 
+<a id="saga"></a>
 # 🔄 Saga
 
 Transferências envolvem múltiplos serviços. O sistema usa **Saga orientada a eventos**.
@@ -228,6 +236,7 @@ Transferências envolvem múltiplos serviços. O sistema usa **Saga orientada a 
 
 ---
 
+<a id="minimal-apis"></a>
 # ⚙️ Minimal APIs
 
 Os serviços HTTP utilizam **Minimal APIs** do ASP.NET Core.
@@ -273,6 +282,7 @@ Os serviços HTTP utilizam **Minimal APIs** do ASP.NET Core.
 
 ---
 
+<a id="configuracoes"></a>
 # ⚙️ Configurações
 
 Cada microserviço usa **appsettings.json** e **Options Pattern** para configuração. Variáveis de ambiente sobrescrevem valores (ex.: no Docker ou Kubernetes).
@@ -308,6 +318,7 @@ Constantes estáticas em código (tamanhos, limites): `CurrentAccountConfigurati
 
 ---
 
+<a id="testes"></a>
 # 🧪 Testes
 
 ## Testes unitários
@@ -332,6 +343,7 @@ cd bank-more-fees && dotnet test
 
 ---
 
+<a id="fluxos-do-sistema"></a>
 # ▶️ Fluxos do Sistema
 
 ## Desenho do fluxo da aplicação
@@ -422,6 +434,7 @@ sequenceDiagram
 
 ---
 
+<a id="token-e-identificacao-do-usuario"></a>
 # 🔑 Token e identificação do usuário
 
 Em **todas as requisições autenticadas**, o **token JWT** (obtido no login) identifica **quem** está fazendo a operação. O corpo da requisição não precisa repetir a conta de origem ou o titular.
@@ -434,6 +447,7 @@ Ou seja: o token resolve a identidade em todas as chamadas; o body traz só o qu
 
 ---
 
+<a id="testes-via-postman"></a>
 # 📮 Testes via Postman
 
 O projeto inclui a collection **BankMore-API-Tests.postman_collection.json**.
@@ -482,6 +496,7 @@ Ordem sugerida para testar falha: executar os itens da pasta na sequência (1 a 
 
 ---
 
+<a id="execucao-rapida"></a>
 # ▶️ Execução Rápida
 
 ```bash
@@ -509,6 +524,7 @@ Tudo será criado automaticamente:
 
 ---
 
+<a id="tecnologias"></a>
 # 📚 Tecnologias
 
 - **.NET 8**
@@ -524,6 +540,7 @@ Tudo será criado automaticamente:
 
 ---
 
+<a id="deploy-em-kubernetes"></a>
 # 🚀 Deploy em Kubernetes
 
 Os manifestos de produção estão em `k8s/`. Consulte `k8s/README.md` para a ordem de aplicação e pré-requisitos.
@@ -534,6 +551,7 @@ kubectl apply -f k8s/
 
 ---
 
+<a id="observacoes"></a>
 # 👨‍💻 Observações
 
 - Ambiente local completo
