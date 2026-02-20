@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bank-more-current-account
+  labels:
+    app: bank-more-current-account
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: bank-more-current-account
+  template:
+    metadata:
+      labels:
+        app: bank-more-current-account
+    spec:
+      containers:
+        - name: api
+          image: bankmore/current-account:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: bank-more-current-account-config
+            - secretRef:
+                name: bank-more-current-account-secret
+          livenessProbe:
+            httpGet:
+              path: /swagger/index.html
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /swagger/index.html
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"

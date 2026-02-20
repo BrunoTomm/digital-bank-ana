@@ -1,0 +1,294 @@
+{
+  "info": {
+    "name": "BankMore - API Tests",
+    "description": "APIs: Current Account (5000), Transfer (5001), Fees (5002).\n\n**Fluxo sugerido:**\n1. Register (1ª conta) - CPF 52998224725, senha SenhaSegura123\n2. Login - conta 1, senha SenhaSegura123\n3. Register (2ª conta) - cria conta destino para transferência\n4. Balance - confere saldo\n5. Movement (crédito R$ 100) - adiciona saldo na conta 1\n6. Balance - confere\n7. Transfer - envia R$ 15 da conta 1 para conta 2\n8. Balance - confere débito (15 + 1 de tarifa)\n\nInternal: X-Internal-Api-Key = BankMore-Internal-ApiKey-ForTransferService",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "if (pm.request.url.toString().includes('/login') && pm.response.code === 200) {",
+          "    var json = pm.response.json();",
+          "    if (json && json.token) {",
+          "        pm.collectionVariables.set('token', json.token);",
+          "    }",
+          "}"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {"key": "baseCurrentAccount", "value": "http://localhost:5000"},
+    {"key": "baseTransfer", "value": "http://localhost:5001"},
+    {"key": "baseFees", "value": "http://localhost:5002"},
+    {"key": "token", "value": ""},
+    {"key": "destinationAccountNumber", "value": "2"},
+    {"key": "errorTestAccountNumber", "value": "3"},
+    {"key": "internalApiKey", "value": "BankMore-Internal-ApiKey-ForTransferService"}
+  ],
+  "item": [
+    {
+      "name": "Current Account (5000)",
+      "item": [
+        {
+          "name": "Register (1ª conta)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"cpf\": \"52998224725\",\n  \"password\": \"SenhaSegura123\"\n}"},
+            "url": "{{baseCurrentAccount}}/api/accounts/register",
+            "description": "Cria a 1ª conta. CPF 11 dígitos. Execute antes do Login."
+          }
+        },
+        {
+          "name": "Register (2ª conta)",
+          "event": [{
+            "listen": "test",
+            "script": {
+              "exec": [
+                "var json = pm.response.json();",
+                "if (json.accountNumber) { pm.collectionVariables.set('destinationAccountNumber', json.accountNumber.toString()); }"
+              ],
+              "type": "text/javascript"
+            }
+          }],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"cpf\": \"11144477735\",\n  \"password\": \"OutraSenha123\"\n}"},
+            "url": "{{baseCurrentAccount}}/api/accounts/register",
+            "description": "Cria a 2ª conta (destino da transferência). Salva accountNumber em destinationAccountNumber."
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {"mode": "raw", "raw": "{\n  \"accountNumberOrCpf\": \"1\",\n  \"password\": \"SenhaSegura123\"\n}"},
+            "url": "{{baseCurrentAccount}}/api/accounts/login",
+            "description": "Login conta 1. Token salvo em {{token}}. Execute Register (1ª conta) antes."
+          }
+        },
+        {
+          "name": "Balance",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{token}}"}],
+            "url": "{{baseCurrentAccount}}/api/accounts/balance",
+            "description": "Saldo da conta autenticada."
+          }
+        },
+        {
+          "name": "Movement (crédito R$ 100)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"accountNumber\": null,\n  \"value\": 100.00,\n  \"type\": \"C\"\n}"},
+            "url": "{{baseCurrentAccount}}/api/accounts/movement",
+            "description": "Crédito na conta do token. C=crédito, D=débito."
+          }
+        },
+        {
+          "name": "Movement (débito)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"accountNumber\": null,\n  \"value\": 10.00,\n  \"type\": \"D\"\n}"},
+            "url": "{{baseCurrentAccount}}/api/accounts/movement"
+          }
+        },
+        {
+          "name": "Inactivate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"password\": \"SenhaSegura123\"\n}"},
+            "url": "{{baseCurrentAccount}}/api/accounts/inactivate",
+            "description": "Inativa a conta (204 No Content)."
+          }
+        },
+        {
+          "name": "Internal - Get account-id",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "X-Internal-Api-Key", "value": "{{internalApiKey}}"}],
+            "url": {
+              "raw": "{{baseCurrentAccount}}/api/internal/account-id?number={{destinationAccountNumber}}",
+              "host": ["{{baseCurrentAccount}}"],
+              "path": ["api", "internal", "account-id"],
+              "query": [{"key": "number", "value": "{{destinationAccountNumber}}"}]
+            },
+            "description": "Retorna accountId (GUID) pelo número da conta."
+          }
+        },
+        {
+          "name": "Internal - Movement",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "X-Internal-Api-Key", "value": "{{internalApiKey}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"accountId\": \"colar-guid-da-conta\",\n  \"amount\": 5.00,\n  \"type\": \"D\"\n}"},
+            "url": "{{baseCurrentAccount}}/api/internal/movement",
+            "description": "Movimentação interna. Use o GUID retornado por Internal - Get account-id."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transfer (5001)",
+      "item": [
+        {
+          "name": "Transfer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Content-Type", "value": "application/json"},
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "body": {"mode": "raw", "raw": "{\n  \"destinationAccountNumber\": {{destinationAccountNumber}},\n  \"amount\": 15.00\n}"},
+            "url": "{{baseTransfer}}/api/transfers/",
+            "description": "Transferência da conta logada para destinationAccountNumber. Tarifa R$ 1,00 é debitada automaticamente."
+          }
+        },
+        {
+          "name": "Cenários de Erro (Saga/Polly)",
+          "item": [
+            {
+              "name": "1 - Register (3ª conta)",
+              "event": [{
+                "listen": "test",
+                "script": {
+                  "exec": [
+                    "var json = pm.response.json();",
+                    "if (json.accountNumber) { pm.collectionVariables.set('errorTestAccountNumber', json.accountNumber.toString()); }"
+                  ],
+                  "type": "text/javascript"
+                }
+              }],
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"cpf\": \"12345678909\",\n  \"password\": \"SenhaTeste123\"\n}"},
+                "url": "{{baseCurrentAccount}}/api/accounts/register",
+                "description": "Cria conta 3 para teste de erro. Salva em errorTestAccountNumber."
+              }
+            },
+            {
+              "name": "2 - Login (conta 3)",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"accountNumberOrCpf\": \"{{errorTestAccountNumber}}\",\n  \"password\": \"SenhaTeste123\"\n}"},
+                "url": "{{baseCurrentAccount}}/api/accounts/login",
+                "description": "Login conta criada no passo 1 para inativar."
+              }
+            },
+            {
+              "name": "3 - Inactivate (conta 3)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Authorization", "value": "Bearer {{token}}"}
+                ],
+                "body": {"mode": "raw", "raw": "{\n  \"password\": \"SenhaTeste123\"\n}"},
+                "url": "{{baseCurrentAccount}}/api/accounts/inactivate",
+                "description": "Inativa conta 3."
+              }
+            },
+            {
+              "name": "4 - Login (conta 1)",
+              "request": {
+                "method": "POST",
+                "header": [{"key": "Content-Type", "value": "application/json"}],
+                "body": {"mode": "raw", "raw": "{\n  \"accountNumberOrCpf\": \"1\",\n  \"password\": \"SenhaSegura123\"\n}"},
+                "url": "{{baseCurrentAccount}}/api/accounts/login",
+                "description": "Restaura token da conta 1."
+              }
+            },
+            {
+              "name": "5 - Transfer para conta inativa (Saga/Polly)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Authorization", "value": "Bearer {{token}}"}
+                ],
+                "body": {"mode": "raw", "raw": "{\n  \"destinationAccountNumber\": {{errorTestAccountNumber}},\n  \"amount\": 10.00\n}"},
+                "url": "{{baseTransfer}}/api/transfers/",
+                "description": "Débito origem OK, crédito destino FALHA (conta inativa). Dispara compensação (crédito na origem) com retry Polly. Esperado: 400 com TRANSFER_FAILED. Conferir logs do Transfer."
+              }
+            },
+            {
+              "name": "Erro - Destino inválido",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Authorization", "value": "Bearer {{token}}"}
+                ],
+                "body": {"mode": "raw", "raw": "{\n  \"destinationAccountNumber\": 99999,\n  \"amount\": 10.00\n}"},
+                "url": "{{baseTransfer}}/api/transfers/",
+                "description": "Conta 99999 não existe. Falha antes do débito."
+              }
+            },
+            {
+              "name": "Erro - Mesma conta",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Authorization", "value": "Bearer {{token}}"}
+                ],
+                "body": {"mode": "raw", "raw": "{\n  \"destinationAccountNumber\": 1,\n  \"amount\": 10.00\n}"},
+                "url": "{{baseTransfer}}/api/transfers/",
+                "description": "Origem e destino iguais. Falha antes do débito. Token deve ser conta 1."
+              }
+            },
+            {
+              "name": "Erro - Valor inválido",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {"key": "Content-Type", "value": "application/json"},
+                  {"key": "Authorization", "value": "Bearer {{token}}"}
+                ],
+                "body": {"mode": "raw", "raw": "{\n  \"destinationAccountNumber\": 2,\n  \"amount\": 0\n}"},
+                "url": "{{baseTransfer}}/api/transfers/",
+                "description": "Valor zero. Falha na validação."
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Fees (5002)",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseFees}}/health",
+            "description": "Health check."
+          }
+        }
+      ]
+    }
+  ]
+}

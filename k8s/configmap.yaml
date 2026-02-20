@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bankmore-config
+  namespace: bankmore
+data:
+  kafka-bootstrap: "kafka:29092"
+  kafka-topic-transfers: "bankmore.transfers.completed"
+  kafka-topic-fees: "bankmore.fees.completed"
+  kafka-topic-dlq: "bankmore.current-account.dlq"
+  fee-amount: "1.00"

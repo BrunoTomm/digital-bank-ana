@@ -1,0 +1,171 @@
+# BankMore - dev environment: Current Account, Transfer, Fees, Kafka, Oracle
+# Run from repo root: docker compose up -d
+# Volumes: oracle-data and kafka-data for persistence across restarts.
+
+services:
+  oracle:
+    image: gvenzl/oracle-xe:21-slim-faststart
+    environment:
+      ORACLE_PASSWORD: bankmore
+      APP_USER: bankmore
+      APP_USER_PASSWORD: bankmore
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  oracle-db-init:
+    image: gvenzl/oracle-xe:21-slim-faststart
+    depends_on:
+      oracle:
+        condition: service_healthy
+    volumes:
+      - .:/scripts:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        echo "Creating Oracle tables..."
+        run_sql() { sqlplus -S bankmore/bankmore@//oracle:1521/XEPDB1 @"$1" </dev/null; }
+        check_ok() {
+          printf "SET FEEDBACK OFF HEADING OFF PAGESIZE 0\nSELECT 1 FROM user_tables WHERE table_name='CONTACORRENTE' AND ROWNUM=1;\nEXIT;\n" \
+            | sqlplus -S bankmore/bankmore@//oracle:1521/XEPDB1 2>/dev/null | grep -q "1"
+        }
+        for n in 1 2 3 4 5; do
+          run_sql /scripts/bank-more-current-account/scripts/001_create_tables_oracle.sql || true
+          run_sql /scripts/bank-more-transfer/scripts/001_create_tables_oracle.sql || true
+          run_sql /scripts/bank-more-fees/scripts/001_create_tables_oracle.sql || true
+          if check_ok; then echo "Tables ready."; exit 0; fi
+          echo "Retry $$n/5 in 5s..."
+          sleep 5
+        done
+        echo "Failed to create tables."
+        exit 1
+    restart: "no"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    hostname: kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+      KAFKA_LISTENERS: "PLAINTEXT://kafka:29092,CONTROLLER://kafka:29093,PLAINTEXT_HOST://0.0.0.0:9092"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:29093"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LOG_DIRS: "/tmp/kraft-combined-logs"
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.5.0
+    depends_on:
+      kafka:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Creating Kafka topics..."
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --topic bankmore.transfers.completed --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --topic bankmore.fees.completed --partitions 1 --replication-factor 1
+        kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --topic bankmore.current-account.dlq --partitions 1 --replication-factor 1
+        echo "Topics ready."
+
+  bank-more-current-account:
+    build:
+      context: ./bank-more-current-account
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__DefaultConnection: "User Id=bankmore;Password=bankmore;Data Source=oracle:1521/XEPDB1"
+      Jwt__Secret: "BankMore-SuperSecretKey-AtLeast32CharactersLong!"
+      Jwt__Issuer: "BankMore.CurrentAccount"
+      Jwt__Audience: "BankMore"
+      Internal__ApiKey: "BankMore-Internal-ApiKey-ForTransferService"
+      Kafka__BootstrapServers: "kafka:29092"
+      Kafka__TopicTransfersCompleted: "bankmore.transfers.completed"
+      Kafka__TopicFeesCompleted: "bankmore.fees.completed"
+      Kafka__TopicDlq: "bankmore.current-account.dlq"
+      Kafka__ConsumerGroupId: "bankmore-current-account"
+    depends_on:
+      oracle:
+        condition: service_healthy
+      oracle-db-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
+
+  bank-more-fees:
+    build:
+      context: ./bank-more-fees
+      dockerfile: Dockerfile
+    ports:
+      - "5002:8080"
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+      Kafka__BootstrapServers: "kafka:29092"
+      Kafka__TopicTransfersCompleted: "bankmore.transfers.completed"
+      Kafka__TopicFeesCompleted: "bankmore.fees.completed"
+      Kafka__ConsumerGroupId: "bankmore-fees"
+      Fee__FixedAmountPerTransfer: "1.00"
+    depends_on:
+      oracle-db-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
+
+  bank-more-transfer:
+    build:
+      context: ./bank-more-transfer
+      dockerfile: Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__DefaultConnection: "User Id=bankmore;Password=bankmore;Data Source=oracle:1521/XEPDB1"
+      Jwt__Secret: "BankMore-SuperSecretKey-AtLeast32CharactersLong!"
+      Jwt__Issuer: "BankMore.CurrentAccount"
+      Jwt__Audience: "BankMore"
+      CurrentAccountApi__BaseUrl: "http://bank-more-current-account:8080"
+      CurrentAccountApi__InternalApiKey: "BankMore-Internal-ApiKey-ForTransferService"
+      Kafka__BootstrapServers: "kafka:29092"
+      Kafka__TopicTransfersCompleted: "bankmore.transfers.completed"
+    depends_on:
+      bank-more-current-account:
+        condition: service_started
+      oracle-db-init:
+        condition: service_completed_successfully
+      kafka-init:
+        condition: service_completed_successfully
+      kafka:
+        condition: service_healthy
+
+volumes:
+  oracle-data:
+  kafka-data:

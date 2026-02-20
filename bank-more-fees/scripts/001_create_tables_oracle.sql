@@ -1,0 +1,23 @@
+
+WHENEVER SQLERROR CONTINUE
+
+BEGIN
+  EXECUTE IMMEDIATE '
+    CREATE TABLE tarifas (
+      idtarifa VARCHAR2(37) PRIMARY KEY,
+      idcontacorrente VARCHAR2(37) NOT NULL,
+      datamovimento VARCHAR2(25) NOT NULL,
+      valor NUMBER(18,2) NOT NULL,
+      CONSTRAINT fk_tarifas_conta FOREIGN KEY (idcontacorrente) REFERENCES contacorrente(idcontacorrente)
+    )';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE NOT IN (-955) THEN RAISE; END IF;
+END;
+/
+
+BEGIN
+  EXECUTE IMMEDIATE 'CREATE INDEX idx_tarifas_idcontacorrente ON tarifas(idcontacorrente)';
+EXCEPTION WHEN OTHERS THEN IF SQLCODE NOT IN (-955, -1408) THEN RAISE; END IF;
+END;
+/
+
+WHENEVER SQLERROR EXIT 1

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bank-more-transfer-config
+data:
+  ASPNETCORE_URLS: "http://+:8080"
+  Jwt__Issuer: "BankMore.CurrentAccount"
+  Jwt__Audience: "BankMore"
+  CurrentAccountApi__BaseUrl: "http://bank-more-current-account:8080"
+  CurrentAccountApi__InternalApiKey: "BankMore-Internal-ApiKey-ForTransferService"

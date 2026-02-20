@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{4C7214E2-F314-4098-BF48-02EA0B95DCFF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.CurrentAccount.Api", "src\BankMore.CurrentAccount.Api\BankMore.CurrentAccount.Api.csproj", "{825F6C92-B82F-4ED9-99B8-6CEC23158DDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.CurrentAccount.Domain", "src\BankMore.CurrentAccount.Domain\BankMore.CurrentAccount.Domain.csproj", "{A3311C71-0403-4869-BCF9-E0C13FB9DD83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.CurrentAccount.Application", "src\BankMore.CurrentAccount.Application\BankMore.CurrentAccount.Application.csproj", "{02358834-0C86-4DC4-A8E4-C3E1348D4C84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.CurrentAccount.Infrastructure", "src\BankMore.CurrentAccount.Infrastructure\BankMore.CurrentAccount.Infrastructure.csproj", "{F28456BD-55D8-4D86-B4D5-C15D0D71AF87}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8BE4466D-24D3-4399-83B4-827B0C52CF7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.CurrentAccount.Tests.Unit", "tests\BankMore.CurrentAccount.Tests.Unit\BankMore.CurrentAccount.Tests.Unit.csproj", "{4FF447F4-3E13-473F-ABF7-4DDC781FD660}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.CurrentAccount.Tests.Integration", "tests\BankMore.CurrentAccount.Tests.Integration\BankMore.CurrentAccount.Tests.Integration.csproj", "{B136CD10-EDB5-4200-A93A-6AE3403FC642}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{825F6C92-B82F-4ED9-99B8-6CEC23158DDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{825F6C92-B82F-4ED9-99B8-6CEC23158DDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{825F6C92-B82F-4ED9-99B8-6CEC23158DDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{825F6C92-B82F-4ED9-99B8-6CEC23158DDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3311C71-0403-4869-BCF9-E0C13FB9DD83}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3311C71-0403-4869-BCF9-E0C13FB9DD83}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3311C71-0403-4869-BCF9-E0C13FB9DD83}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3311C71-0403-4869-BCF9-E0C13FB9DD83}.Release|Any CPU.Build.0 = Release|Any CPU
+		{02358834-0C86-4DC4-A8E4-C3E1348D4C84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{02358834-0C86-4DC4-A8E4-C3E1348D4C84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{02358834-0C86-4DC4-A8E4-C3E1348D4C84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{02358834-0C86-4DC4-A8E4-C3E1348D4C84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F28456BD-55D8-4D86-B4D5-C15D0D71AF87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F28456BD-55D8-4D86-B4D5-C15D0D71AF87}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F28456BD-55D8-4D86-B4D5-C15D0D71AF87}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F28456BD-55D8-4D86-B4D5-C15D0D71AF87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FF447F4-3E13-473F-ABF7-4DDC781FD660}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FF447F4-3E13-473F-ABF7-4DDC781FD660}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FF447F4-3E13-473F-ABF7-4DDC781FD660}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FF447F4-3E13-473F-ABF7-4DDC781FD660}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B136CD10-EDB5-4200-A93A-6AE3403FC642}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B136CD10-EDB5-4200-A93A-6AE3403FC642}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B136CD10-EDB5-4200-A93A-6AE3403FC642}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B136CD10-EDB5-4200-A93A-6AE3403FC642}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{825F6C92-B82F-4ED9-99B8-6CEC23158DDB} = {4C7214E2-F314-4098-BF48-02EA0B95DCFF}
+		{A3311C71-0403-4869-BCF9-E0C13FB9DD83} = {4C7214E2-F314-4098-BF48-02EA0B95DCFF}
+		{02358834-0C86-4DC4-A8E4-C3E1348D4C84} = {4C7214E2-F314-4098-BF48-02EA0B95DCFF}
+		{F28456BD-55D8-4D86-B4D5-C15D0D71AF87} = {4C7214E2-F314-4098-BF48-02EA0B95DCFF}
+		{4FF447F4-3E13-473F-ABF7-4DDC781FD660} = {8BE4466D-24D3-4399-83B4-827B0C52CF7E}
+		{B136CD10-EDB5-4200-A93A-6AE3403FC642} = {8BE4466D-24D3-4399-83B4-827B0C52CF7E}
+	EndGlobalSection
+EndGlobal

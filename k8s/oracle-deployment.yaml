@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oracle
+  namespace: bankmore
+  labels:
+    app: oracle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oracle
+  template:
+    metadata:
+      labels:
+        app: oracle
+    spec:
+      containers:
+        - name: oracle
+          image: gvenzl/oracle-xe:21-slim-faststart
+          ports:
+            - containerPort: 1521
+          env:
+            - name: ORACLE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bankmore-secrets
+                  key: oracle-password
+            - name: APP_USER
+              value: "bankmore"
+            - name: APP_USER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: bankmore-secrets
+                  key: oracle-app-password
+          volumeMounts:
+            - name: oracle-data
+              mountPath: /opt/oracle/oradata
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+          livenessProbe:
+            exec:
+              command: ["healthcheck.sh"]
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+      volumes:
+        - name: oracle-data
+          persistentVolumeClaim:
+            claimName: oracle-data

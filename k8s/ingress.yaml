@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bankmore-ingress
+  namespace: bankmore
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+    - host: current-account.bankmore.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bank-more-current-account
+                port:
+                  number: 8080
+    - host: transfer.bankmore.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bank-more-transfer
+                port:
+                  number: 8080
+    - host: fees.bankmore.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: bank-more-fees
+                port:
+                  number: 8080

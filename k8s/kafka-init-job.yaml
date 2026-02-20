@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-init
+  namespace: bankmore
+spec:
+  ttlSecondsAfterFinished: 300
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kafka-init
+          image: confluentinc/cp-kafka:7.5.0
+          command:
+            - /bin/sh
+            - -c
+            - |
+              echo "Creating Kafka topics..."
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --topic bankmore.transfers.completed --partitions 1 --replication-factor 1
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --topic bankmore.fees.completed --partitions 1 --replication-factor 1
+              kafka-topics --create --if-not-exists --bootstrap-server kafka:29092 --topic bankmore.current-account.dlq --partitions 1 --replication-factor 1
+              echo "Topics ready."

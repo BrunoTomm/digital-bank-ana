@@ -1,0 +1,38 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A1B2C3D4-1111-4E5F-9A1B-2C3D4E5F6A7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.Fees.Application", "src\BankMore.Fees.Application\BankMore.Fees.Application.csproj", "{B2C3D4E5-2222-4E5F-9A1B-2C3D4E5F6A7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.Fees.Infrastructure", "src\BankMore.Fees.Infrastructure\BankMore.Fees.Infrastructure.csproj", "{C3D4E5F6-3333-4E5F-9A1B-2C3D4E5F6A7B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BankMore.Fees.Api", "src\BankMore.Fees.Api\BankMore.Fees.Api.csproj", "{D4E5F6A7-4444-4E5F-9A1B-2C3D4E5F6A7B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B2C3D4E5-2222-4E5F-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2C3D4E5-2222-4E5F-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2C3D4E5-2222-4E5F-9A1B-2C3D4E5F6A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2C3D4E5-2222-4E5F-9A1B-2C3D4E5F6A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3D4E5F6-3333-4E5F-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3D4E5F6-3333-4E5F-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3D4E5F6-3333-4E5F-9A1B-2C3D4E5F6A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3D4E5F6-3333-4E5F-9A1B-2C3D4E5F6A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4E5F6A7-4444-4E5F-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4E5F6A7-4444-4E5F-9A1B-2C3D4E5F6A7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4E5F6A7-4444-4E5F-9A1B-2C3D4E5F6A7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4E5F6A7-4444-4E5F-9A1B-2C3D4E5F6A7B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B2C3D4E5-2222-4E5F-9A1B-2C3D4E5F6A7B} = {A1B2C3D4-1111-4E5F-9A1B-2C3D4E5F6A7B}
+		{C3D4E5F6-3333-4E5F-9A1B-2C3D4E5F6A7B} = {A1B2C3D4-1111-4E5F-9A1B-2C3D4E5F6A7B}
+		{D4E5F6A7-4444-4E5F-9A1B-2C3D4E5F6A7B} = {A1B2C3D4-1111-4E5F-9A1B-2C3D4E5F6A7B}
+	EndGlobalSection
+EndGlobal
