@@ -1,5 +1,28 @@
 # BankMore – Plataforma de Contas Digitais
 
+## Sumário
+
+- [🔐 Credenciais de Banco de Dados (Oracle)](#credenciais-de-banco-de-dados-oracle)
+- [📌 Visão Geral](#visão-geral)
+- [🏗️ Arquitetura](#arquitetura)
+- [🗄️ Bases de Dados](#bases-de-dados)
+- [🐳 Containerização](#containerização)
+- [📬 Mensageria (Kafka)](#mensageria-kafka)
+- [♻️ Idempotência](#idempotência)
+- [🔄 Saga](#saga)
+- [⚙️ Minimal APIs](#minimal-apis)
+- [⚙️ Configurações](#configurações)
+- [🧪 Testes](#testes)
+- [▶️ Fluxos do Sistema](#fluxos-do-sistema)
+- [🔑 Token e identificação do usuário](#token-e-identificação-do-usuário)
+- [📮 Testes via Postman](#testes-via-postman)
+- [▶️ Execução Rápida](#execução-rápida)
+- [📚 Tecnologias](#tecnologias)
+- [🚀 Deploy em Kubernetes](#deploy-em-kubernetes)
+- [👨‍💻 Observações](#observações)
+
+---
+
 ## 🔐 Credenciais de Banco de Dados (Oracle)
 
 Para visualizar dados e tabelas em ferramentas como **DBeaver** ou **SQL Developer**:
